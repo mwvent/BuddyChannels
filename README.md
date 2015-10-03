@@ -1,6 +1,7 @@
-# ServerChannels
+# BuddyChannels
 
 Server chat channels plugin for PocketMine-MP using wordpress buddypress groups as the channels
+Rewrite of https://github.com/EvolSoft/ServerChannels
 
 ## Category
 
