@@ -185,7 +185,7 @@ class Main extends PluginBase {
 	}
 	$this->users_hasmutedpublic[strtolower( $player->getName() )] = 0;
 	if( $row = $result->fetch_assoc() ) {
-	    $this->channelnames[$row['channelnumber']] = $row['groupname'];
+	    $this->channelnames[$row['channelnumber']] = stripcslashes($row['groupname']);
 	    $this->users_hasmutedpublic[strtolower( $player->getName() )] = $row['hasmutedpublic'];
 	    return $row['channelnumber'];
 	}
@@ -250,7 +250,7 @@ class Main extends PluginBase {
 
 	// TODO PAGIGNATION
 	while ($row = $res->fetch_assoc()) {
-	    $groups[$row['group_id']] = $row['name'];
+	    $groups[$row['group_id']] = stripcslashes($row['name']);
 	}
 
 	return $groups;
