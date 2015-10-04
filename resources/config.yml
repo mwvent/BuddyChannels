@@ -1,0 +1,19 @@
+---
+datetime-format: "H:i:s"
+log-on-console: true
+# do not use localhost for server it doesnt work - use 127.0.0.1 instead
+mysql-server: 127.0.0.1
+mysql-user: username
+mysql-pass: password
+database: pocketmine
+# tables created by buddypress - you may be using a prefix
+buddypress-bp_groups_members-tablename: bp_groups_members
+buddypress-bp_groups-tablename: bp_groups
+# tables created by wordpress - you be using a prefix
+wordpress-users-tablename: users
+# tables that will be created and belong to buddychannels
+buddychannels-users-table: buddychannels_users
+buddychannels-chatlog-table: buddychannels_chatlog
+# website to mention when telling players where to do groups
+website: "HTTPS://YOURWEBSITE.WHATEVER"
+...
