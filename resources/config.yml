@@ -1,6 +1,12 @@
 ---
 datetime-format: "H:i:s"
 log-on-console: true
+# this server id and name - useful if you need plugin to link the chat of server instances together
+# server-id must be numeric, server-name can be text
+server-id: 0
+server-name: untitled
+# load chat from other server ids (share chat between server instances)
+connect-server-chat: false
 # do not use localhost for server it doesnt work - use 127.0.0.1 instead
 mysql-server: 127.0.0.1
 mysql-user: username
@@ -13,7 +19,21 @@ buddypress-bp_groups-tablename: bp_groups
 wordpress-users-tablename: users
 # tables that will be created and belong to buddychannels
 buddychannels-users-table: buddychannels_users
+buddychannels-servers-table: buddychannels_servers
 buddychannels-chatlog-table: buddychannels_chatlog
 # website to mention when telling players where to do groups
 website: "HTTPS://YOURWEBSITE.WHATEVER"
+# spam filter
+use-spamfilter: false
+spamfilter-time-interval: 60
+spamfilter-max-duplicates-per-interval: 2
+spamfilter-max-messages-per-interval: 6
+# swearing is immature filter
+# turns a user into baby where each word they type is converted into baby babble for
+# a time period - the swear words are hard coded to have as few false positives as possible
+swearing-is-immature: false
+swearing-is-immature-punishment-period: 60
+# dumb swear filter - censors patterns from the badwords.txt list
+# no punishment due to high potential of false positives
+use-wordlist-censor: false
 ...
