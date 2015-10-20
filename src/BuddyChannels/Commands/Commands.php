@@ -1,6 +1,7 @@
 <?php
 
 namespace BuddyChannels\Commands;
+use BuddyChannels\Main;
 
 use pocketmine\command\Command;
 use pocketmine\command\CommandExecutor;
@@ -9,8 +10,6 @@ use pocketmine\permission\Permission;
 use pocketmine\Player;
 use pocketmine\plugin\PluginBase;
 use pocketmine\utils\TextFormat;
-
-use BuddyChannels\Main;
 
 class Commands extends PluginBase implements CommandExecutor{
 	public function __construct(Main $plugin) {
@@ -48,8 +47,7 @@ class Commands extends PluginBase implements CommandExecutor{
 		    $sender->sendMessage($this->plugin->translateColors("&", "&cThis command can only be used in-game"));
 		    return;
 		}
-		$sender->sendMessage($this->plugin->translateColors("&", "&cMuting &dpublic channel"));
-		$this->plugin->setUserPublicMute($sender->getName(), 1);
+		$newTask = new \BuddyChannels\Tasks\SetMutePublicTask($this->plugin, $sender, true);
 		break;
 
 	    case "unmute" :
@@ -57,8 +55,7 @@ class Commands extends PluginBase implements CommandExecutor{
 		    $sender->sendMessage($this->plugin->translateColors("&", "&cThis command can only be used in-game"));
 		    return;
 		}
-		$sender->sendMessage($this->plugin->translateColors("&", "&aUnmuting &dpublic channel"));
-		$this->plugin->setUserPublicMute($sender->getName(), 0);
+		$newTask = new \BuddyChannels\Tasks\SetMutePublicTask($this->plugin, $sender, false);
 		break;
 	    
 	    case "shout" :
@@ -66,14 +63,27 @@ class Commands extends PluginBase implements CommandExecutor{
 		    $sender->sendMessage($this->plugin->translateColors("&", "&cThis command can only be used in-game"));
 		    return;
 		}
-		$this->plugin->SendChannelMessage($sender, $args[1], true);
+		if( ! isset($args[1]) ) {
+		    $sender->sendMessage($this->plugin->translateColors("&", "&cUsage: /sh <text>"));
+		    return;
+		}
+		$player = $sender;
+		$username = strtolower($player->getName());
+		$userchannel_number = $this->plugin->database->read_cached_user_channels($username);
+		$userchannel_name = $this->plugin->database->read_cached_channelNames($userchannel_number);
+		$username_lcase = strtolower($player->getName());
+		$message = new \BuddyChannels\Message(
+		    $player,
+		    $userchannel_number, // channel number
+		    $userchannel_name, // channel name
+		    $this->plugin->getPlayerRank($player),
+		    implode(" ",array_slice($args, 1)),
+		    true // shouting
+		);
+		$messageTask = new \BuddyChannels\Tasks\SendMessageTask($message, $this->plugin);
 		break;
 		
 	    case "help" : 
-		if( ! $sender->hasPermission("buddychannels.commands.help")) {
-		    $sender->sendMessage($this->plugin->translateColors("&", "&cYou don't have permissions to use this command"));
-		    return;
-		}
 		$messages = array(
 		    "&b>> &aAvailable Commands &b<<",
 		    "&a/ch info &b>>&e Show info about this plugin",
@@ -96,7 +106,7 @@ class Commands extends PluginBase implements CommandExecutor{
 			return;
 		}
 		$sender->sendMessage($this->plugin->translateColors("&", Main::PREFIX . "&eBuddyChannels &bv" . Main::VERSION . " &edeveloped by&b " . Main::PRODUCER));
-		$sender->sendMessage($this->plugin->translateColors("&", Main::PREFIX . "&eWebsite &b" . Main::MAIN_WEBSITE));
+		$sender->sendMessage($this->plugin->translateColors("&", Main::PREFIX . "&eWebsite &b" . $this->plugin->website));
 		break;
 	    
 	    case "list" :
@@ -108,15 +118,16 @@ class Commands extends PluginBase implements CommandExecutor{
 		    $sender->sendMessage($this->plugin->translateColors("&", "&cThis command can only be used in-game"));
 		    return;
 		}
-		$list = $this->plugin->getAllChannels($sender);
-		$sender->sendMessage($this->plugin->translateColors("&", "&b>> &aAvailable Channels &b<<"));
-		foreach($list as $channum => $channame) {
-		    $sender->sendMessage($this->plugin->translateColors("&", "/ch &b&c" . $channum . " &a" . $channame));
+		if( ! isset($args[1])) {
+		    $page = 1;
+		} else {
+		    $page = $args[1];
 		}
-		if(count($list) <2) {
-		    $sender->sendMessage($this->plugin->translateColors("&", 
-			"&dVisit " . $this->plugin->website ." and join social groups to add more."));
+		if( ! is_numeric($page)) {
+		    $sender->sendMessage(Main::translateColors("&", Main::PREFIX  . "&cPage must be a number - showing page 1"));
+		    $page = 1;
 		}
+		$newTask = new \BuddyChannels\Tasks\ListChannelsTask($this->plugin, $sender, $this->plugin->website, $page);
 		break;
 	    
 	    case "join" :
@@ -136,7 +147,7 @@ class Commands extends PluginBase implements CommandExecutor{
 		    $sender->sendMessage($this->plugin->translateColors("&", Main::PREFIX  . "&cChannel must be a number"));
 		    return;
 		}
-		$this->plugin->joinChannel($sender, $args[1]);
+		$newTask = new \BuddyChannels\Tasks\JoinChannelTask($this->plugin, $sender, $args[1], $this->plugin->website);
 		break;	
 	}
     }
