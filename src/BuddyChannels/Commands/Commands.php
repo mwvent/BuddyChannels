@@ -17,10 +17,11 @@ class Commands extends PluginBase implements CommandExecutor{
     }
     
     public function onCommand(CommandSender $sender, Command $cmd, $label, array $args) {
-	if(!strtolower($cmd->getName()) == "buddychannels" && !strtolower($cmd->getName()) == "shout") {
+	$valid_commands = array("buddychannels", "shout", "block", "unblock");
+	if(!in_array($cmd->getName(), $valid_commands)) {
 		return;
 	}
-    
+
 	// shout command alias for /ch shout
 	if(strtolower($cmd->getName()) == "shout") {
 		$newargs = array(
@@ -30,18 +31,88 @@ class Commands extends PluginBase implements CommandExecutor{
 		$args = $newargs;
 	}
 	
+	// block command alias for /ch block
+	if(strtolower($cmd->getName()) == "block") {
+		$newargs = array(0 => "block");
+		if( isset($args[0]) ) {
+		    $newargs[1] = $args[0];
+		}
+		$args = $newargs;
+	}
+	
+	// unblock command alias for /ch unblock
+	if(strtolower($cmd->getName()) == "unblock") {
+		$newargs = array(0 => "unblock");
+		if( isset($args[0]) ) {
+		    $newargs[1] = $args[0];
+		}
+		$args = $newargs;
+	}
+	
 	// no args help shortcut
 	if(!isset($args[0])) {
 		$args[0]="help";
 	}
 	
-	// ch join shortcut
+	// ch join shortcut i.e. /ch 1 is = to /ch join 1
 	if(is_numeric($args[0])) {
 		$args[1] = $args[0];
 		$args[0] = "join";
 	}
 	
 	switch($args[0]) {
+	    case "block" :
+		if( ! $sender instanceof Player) {
+		    $sender->sendMessage($this->plugin->translateColors("&", "&cThis command can only be used in-game"));
+		    return;
+		}
+		if( ! isset($args[1]) ) {
+		    $sender->sendMessage($this->plugin->translateColors("&", "&cUsage: /ch block <name>"));
+		    return;
+		}
+		$player = $this->plugin->getPlayer($args[1]);
+		if(!$player){
+		    $player = null;
+		    $player_name = $args[1];
+		} else {
+		    $player_name = $player->getName();
+		}
+		if(strtolower($player_name) === strtolower($sender->getName())){
+		    $sender->sendMessage(TextFormat::RED . "[Error] You can't block yourself silly :-)");
+		    return false;
+		}
+		if( !is_null($player) ) {
+		    $newTask = new \BuddyChannels\Tasks\SetUserBlockTask($this->plugin, $sender, $player_name, true, $player);
+		} else {
+		    $newTask = new \BuddyChannels\Tasks\SetUserBlockTask($this->plugin, $sender, $player_name, true);
+		}
+		break;
+	    case "unblock" :
+		if( ! $sender instanceof Player) {
+		    $sender->sendMessage($this->plugin->translateColors("&", "&cThis command can only be used in-game"));
+		    return;
+		}
+		if( ! isset($args[1]) ) {
+		    $sender->sendMessage($this->plugin->translateColors("&", "&cUsage: /ch unblock <name>"));
+		    return;
+		}
+		$player = $this->plugin->getPlayer($args[1]);
+		if(!$player){
+		    $player = null;
+		    $player_name = $args[1];
+		} else {
+		    $player_name = $player->getName();
+		}
+		if(strtolower($player_name) === strtolower($sender->getName())){
+		    $sender->sendMessage(TextFormat::RED . "[Error] You can't unblock yourself silly :-)");
+		    return false;
+		}
+		if( !is_null($player) ) {
+		    $newTask = new \BuddyChannels\Tasks\SetUserBlockTask($this->plugin, $sender, $player_name, false, $player);
+		} else {
+		    $newTask = new \BuddyChannels\Tasks\SetUserBlockTask($this->plugin, $sender, $player_name, false);
+		}
+		break;
 	    case "mute" :
 		if( ! $sender instanceof Player) {
 		    $sender->sendMessage($this->plugin->translateColors("&", "&cThis command can only be used in-game"));
@@ -93,7 +164,9 @@ class Commands extends PluginBase implements CommandExecutor{
 		    "&a/shout &b>>&e send a message to public chan",
 		    "&a/sh &b>>&e shortcut for shout",
 		    "&a/ch mute &b>>&e Mutes chat from public channel",
-		    "&a/ch unmute &b>>&e Unmutes chat from public channel"
+		    "&a/ch unmute &b>>&e Unmutes chat from public channel",
+		    "&a/ch block/unblock &c<username> &b>>&e Blocks or unblocks a user from your chat"
+		    
 		);
 		foreach($messages as $message) {
 		    $sender->sendMessage($this->plugin->translateColors("&", $message));

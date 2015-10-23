@@ -25,11 +25,9 @@ class JoinChannelTask extends Task {
     }
     
     public function onRun($currenttick) {
-	$returnmsgs = $this->database->joinChannel($this->player, $this->channel_number);
-	
-	//foreach($returnmsgs as $curmsg) {
-	//    $this->player->sendMessage(Main::translateColors("&", $curmsg);
-	//}
+	$this->database->joinChannel($this->player, $this->channel_number);
+	// ensure user metadata gets updated every channel join / user login
+	$this->database->db_getUserMeta($this->username_lcase, true);
 	
     }
 }

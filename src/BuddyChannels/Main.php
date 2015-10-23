@@ -33,6 +33,8 @@ class Main extends PluginBase {
         $this->saveDefaultConfig();
         $this->getCommand("buddychannels")->setExecutor(new Commands\Commands($this));
         $this->getCommand("shout")->setExecutor(new Commands\Commands($this));
+        $this->getCommand("block")->setExecutor(new Commands\Commands($this));
+        $this->getCommand("unblock")->setExecutor(new Commands\Commands($this));
 	$this->getServer()->getPluginManager()->registerEvents(new EventListener($this), $this);
 	$this->website = $this->read_cfg("website");
 	$this->database = new \BuddyChannels\Database($this);
@@ -169,6 +171,63 @@ class Main extends PluginBase {
 	$this->getServer()->getScheduler()->scheduleAsyncTask($messageTask);
     }
 
+    
+    // getplayer & validateName - copied / stole from EssentialsPE, why reinvent the wheel? thanks guys :-)
+    public function getPlayer($player){
+        if(!$this->validateName($player, false)){
+            return false;
+        }
+        $player = strtolower($player);
+        $found = false;
+        foreach($this->getServer()->getOnlinePlayers() as $p){
+            if(strtolower(TextFormat::clean($p->getDisplayName(), true)) === $player || strtolower($p->getName()) === $player){
+                $found = $p;
+                break;
+            }
+        }
+        // If cannot get the exact player name/nick, try with portions of it
+        if(!$found){
+            $found = ($f = $this->getServer()->getPlayer($player)) === null ? false : $f; // PocketMine function to get from portions of name
+        }
+        /*
+         * Copy from PocketMine's function (use above xD) but modified to work with Nicknames :P
+         *
+         * ALL THE RIGHTS FROM THE FOLLOWING CODE BELONGS TO POCKETMINE-MP
+         */
+        if(!$found){
+            $delta = \PHP_INT_MAX;
+            foreach($this->getServer()->getOnlinePlayers() as $p){
+                // Clean the Display Name due to colored nicks :S
+                if(\stripos(($n = TextFormat::clean($p->getDisplayName(), true)), $player) === 0){
+                    $curDelta = \strlen($n) - \strlen($player);
+                    if($curDelta < $delta){
+                        $found = $p;
+                        $delta = $curDelta;
+                    }
+                    if($curDelta === 0){
+                        break;
+                    }
+                }
+            }
+        }
+        return $found;
+    }
+    
+    public function validateName($string, $allowColorCodes = false) {
+        if(trim($string) === ""){
+            return false;
+        }
+        $format = [];
+        if($allowColorCodes){
+            $format[] = "/(\&|\§)[0-9a-fk-or]/";
+        }
+        $format[] = "/[a-zA-Z0-9_]/"; // Due to color codes can be allowed, then check for them first, so after, make a normal lookup
+        $s = preg_replace($format, "", $string);
+        if(strlen($s) !== 0){
+            return false;
+        }
+        return true;
+    }
 }
 
 

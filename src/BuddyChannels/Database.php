@@ -13,6 +13,7 @@ class Database {
     private $db_statements;
     private $cached_user_channels = array();
     private $cached_user_haspublicmuted = array();
+    private $cached_user_metadata = array();
     private $cached_channelNames = array("0" => "Public");
     
     function __construct( \BuddyChannels\Main $plugin ) {
@@ -24,7 +25,8 @@ class Database {
 	    "wpusers" => $this->plugin->read_cfg("wordpress-users-tablename"),
 	    "bcusers" => $this->plugin->read_cfg("buddychannels-users-table"),
 	    "chatlog" => $this->plugin->read_cfg("buddychannels-chatlog-table"),
-	    "servers" => $this->plugin->read_cfg("buddychannels-servers-table")
+	    "servers" => $this->plugin->read_cfg("buddychannels-servers-table"),
+	    "usermeta" => $this->plugin->read_cfg("buddychannels-user-meta-table")
 	);
 	// try and open connection
 	$this->db = new \mysqli(
@@ -77,6 +79,12 @@ class Database {
 		`connect_chat` TINYINT,
 		PRIMARY KEY (`serverid`)
 	    );";
+	$db_setup_queries["create buddychat user meta table"] = "
+	 CREATE TABLE IF NOT EXISTS `" . $this->tables["usermeta"] . "` (
+		`username` VARCHAR(50),
+		`data_type` VARCHAR(25),
+		`data` TEXT
+	    );";
 	$db_setup_queries["insert this server entry into buddychannels servers table"] = "
 	 INSERT INTO `" . $this->tables["servers"] . "` 
 		(`serverid`, `servername`, `connect_chat`)
@@ -116,7 +124,30 @@ class Database {
     }
     
     private function prepareStatements() {
-	$thisQueryName = "setUserChannel";
+	$thisQueryName = "readUserMetaData";
+	$sql = "SELECT 
+		    `data_type`, `data` 
+		FROM 
+		    " . $this->tables["usermeta"] . "
+		WHERE
+		    `username`= ?";
+	$this->checkPreparedStatement($thisQueryName, $sql);
+	
+	$thisQueryName = "addUserMetaData";
+	$sql = "INSERT INTO " . $this->tables["usermeta"] . "
+		    (`username`, `data_type`, `data`)
+		VALUES
+		    ( ?, ? , ?)";
+	$this->checkPreparedStatement($thisQueryName, $sql);
+	
+	$thisQueryName = "removeUserMetaData";
+	$sql = "DELETE FROM " . $this->tables["usermeta"] . "
+		WHERE
+		    `username` = ? AND `data_type` = ? AND `data` = ?
+	       ";
+	$this->checkPreparedStatement($thisQueryName, $sql);
+	
+    	$thisQueryName = "setUserChannel";
 	$sql = "
 	    INSERT INTO `" . $this->tables["bcusers"] . "` 
 		(`username`, `channel`, `hasmutedpublic`)
@@ -220,6 +251,102 @@ class Database {
 		    `" . $this->tables["chatlog"] . "`.`messagetime` DESC
 		LIMIT 1;";
 	$this->checkPreparedStatement($thisQueryName, $sql);
+    }
+    
+    public function db_getUserMeta($username, $forceReload = false) {
+	$username_lower = strtolower( $username );
+	// if data is already set and forceReload is not required then return cached
+	if( isset($this->cached_user_metadata[$username_lower]) && !$forceReload ) {
+	    return $this->cached_user_metadata[$username_lower];
+	}
+	
+	// otherwise load from db
+	$thisQueryName = "readUserMetaData";
+	
+	$result = $this->db_statements[$thisQueryName]->bind_param("s", $username_lower);
+	if( $result === false ) {
+	    $this->criticalError("Failed to bind to statement " . $thisQueryName . ": " . $this->db_statements[$thisQueryName]->error);
+	    return array();
+	}
+	
+	$result = $this->db_statements[$thisQueryName]->execute();
+	if( ! $result ) {
+	    $this->criticalError("Database error executing "  . $thisQueryName . " " . 
+				 $this->db_statements[$thisQueryName]->error );
+	    @$this->db_statements[$thisQueryName]->free_result();
+	    return false;
+	}
+	
+	$result =  $this->db_statements[$thisQueryName]->bind_result($datatype, $data);
+	if( $result === false ) {
+	    $this->criticalError("Failed to bind result " . $thisQueryName . ": " . $this->db_statements[$thisQueryName]->error);
+	    return false;
+	}
+	
+	$returnArray = array();
+	while( $this->db_statements[$thisQueryName]->fetch() ) {
+	    if(!isset($returnArray[$datatype])) {
+		$returnArray[$datatype] = array();
+	    }
+	    $returnArray[$datatype][$data] = $data;
+	}
+	$this->db_statements[$thisQueryName]->free_result();
+	$this->cached_user_metadata[$username_lower] = $returnArray;
+	return $this->cached_user_metadata[$username_lower];
+    }
+    
+    public function db_addUserMetaData($username, $datatype, $data) {
+	$username_lower = strtolower($username);
+	
+	$thisQueryName = "addUserMetaData";
+	$result = $this->db_statements[$thisQueryName]->bind_param("sss", $username_lower, $datatype, $data);
+	if( $result === false ) {
+	    $this->criticalError("Failed to bind to statement " . $thisQueryName . ": " . $this->db_statements[$thisQueryName]->error);
+	    return array();
+	}
+	
+	$result = $this->db_statements[$thisQueryName]->execute();
+	if( ! $result ) {
+	    $this->criticalError("Database error executing "  . $thisQueryName . " " . 
+				 $this->db_statements[$thisQueryName]->error );
+	    @$this->db_statements[$thisQueryName]->free_result();
+	    return false;
+	}
+	$this->db_statements[$thisQueryName]->free_result();
+	
+	if( !isset($this->cached_user_metadata[$username_lower]) ) {
+	    $this->cached_user_metadata[$username_lower] = array();
+	}
+	if( !isset($this->cached_user_metadata[$username_lower][$datatype]) ) {
+	    $this->cached_user_metadata[$username_lower][$datatype] = array();
+	}
+	$this->cached_user_metadata[$username_lower][$datatype][$data] = $data;
+	return true;
+    }
+    
+    public function db_removeUserMetaData($username, $datatype, $data) {
+	$username_lower = strtolower($username);
+	
+	$thisQueryName = "removeUserMetaData";
+	$result = $this->db_statements[$thisQueryName]->bind_param("sss", $username_lower, $datatype, $data);
+	if( $result === false ) {
+	    $this->criticalError("Failed to bind to statement " . $thisQueryName . ": " . $this->db_statements[$thisQueryName]->error);
+	    return array();
+	}
+	
+	$result = $this->db_statements[$thisQueryName]->execute();
+	if( ! $result ) {
+	    $this->criticalError("Database error executing "  . $thisQueryName . " " . 
+				 $this->db_statements[$thisQueryName]->error );
+	    @$this->db_statements[$thisQueryName]->free_result();
+	    return false;
+	}
+	$this->db_statements[$thisQueryName]->free_result();
+	
+	if( isset( $this->cached_user_metadata[$username_lower][$datatype][$data] ) ) {
+	    unset($this->cached_user_metadata[$username_lower][$datatype][$data]);
+	}
+	return true;
     }
     
     public function db_setUserChannel($username, $channel_number) {
@@ -554,6 +681,14 @@ class Database {
 	}
 	foreach( $this->plugin->getServer()->getOnlinePlayers() as $curplayer ) {
 	    $curplayer_lcase_name = strtolower($curplayer->getName());
+	    // check player has block against sender
+	    $curplayer_metadata = $this->db_getUserMeta($curplayer_lcase_name);
+	    if( $curplayer_metadata !== false ) {
+		$isblocked = isset($curplayer_metadata["blocked"][strtolower($message->username)]);
+		if($isblocked) {
+		    continue;
+		}
+	    }
 	    $curplayer_channelnum = $this->read_cached_user_channels($curplayer_lcase_name);
 	    $curplayer_hasmutedpub = $this->read_cached_user_haspublicmuted($curplayer_lcase_name);
 	    // shouting reaches all users

@@ -23,6 +23,7 @@ wordpress-users-tablename: users
 buddychannels-users-table: buddychannels_users
 buddychannels-servers-table: buddychannels_servers
 buddychannels-chatlog-table: buddychannels_chatlog
+buddychannels-user-meta-table: buddychannels_users_meta
 # website to mention when telling players where to do groups
 website: "HTTPS://YOURWEBSITE.WHATEVER"
 # spam filter

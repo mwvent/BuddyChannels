@@ -9,29 +9,12 @@ commands:
  buddychannels:
    aliases: [chan, ch]
    description: BuddyChannels commands.
-   permission: buddychannels
  shout:
    aliases: [sh]
    description: BuddyChannels shout.
-   
-permissions:
- buddychannels:
-  default: true
-  description: BuddyChannels permissions.
-  children:
-   buddychannels.commands:
-    default: true
-    description: BuddyChannels commands permissions.
-    children:
-      buddychannels.commands.help:
-       default: true
-       description: BuddyChannels command Help permission.
-      buddychannels.commands.info:
-       default: true
-       description: BuddyChannels command Info permission.
-      buddychannels.commands.list:
-       default: true
-       description: BuddyChannels command List permission.
-      buddychannels.commands.join:
-       default: true
-       description: BuddyChannels command Join permission.
+ block:
+   aliases: [blk]
+   description: BuddyChannels block user from (your) chat.
+ unblock:
+   aliases: [unblk]
+   description: BuddyChannels unblock user from (your) chat.
