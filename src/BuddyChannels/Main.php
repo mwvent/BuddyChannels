@@ -147,6 +147,12 @@ class Main extends PluginBase {
 	    case "elder":
 		$rank_formatted = "&c[Elder]";
 		break;
+	    case "youtuber":
+                $rank_formatted = "&c[&dYou&fTuber&c]";
+                break;
+	    case "admin":
+                $rank_formatted = "&c[&4Admin&c]";
+                break;
 	    case "owner":
 		$rank_formatted = "&c[&6E&7n&8g&9i&an&be&ce&dr&c]";
 		break;
