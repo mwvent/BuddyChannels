@@ -33,6 +33,9 @@ class MessageFormatter {
 			}
 		}
 		
+		// caps filter
+		$this->antiCaps ( $message );
+		
 		// hard-coded swear filter with baby punishment
 		if ($this->use_babyFilter) {
 			$this->babyFilter ( $message );
@@ -43,6 +46,25 @@ class MessageFormatter {
 			$this->wordFilter ( $message );
 		}
 	}
+	
+	private function antiCaps(\BuddyChannels\Message $message) {
+		$msglen = strlen ( $message->msg );
+		if( $msglen < 4 ) {
+			return;
+		}
+		$captials_count = strlen( preg_replace('![^A-Z]+!', '', $message->msg) );
+		$all_letters_count = strlen(preg_replace('![^A-Z]+!', '', strtoupper($message->msg)));
+		if ( $captials_count == 0 || $all_letters_count == 0 ) {
+			return;
+		}
+		$captials_percent = ( $captials_count / $all_letters_count );
+		
+		if( $captials_percent > 0.9 ) {
+			$message->msgs_info [] = "&3Is your caps lock stuck?";
+			$message->msg = strtolower( $message->msg );
+		}
+	}
+	
 	private function spamTest(\BuddyChannels\Message $message) {
 		$msg_lcase_nocaps = strtolower ( str_replace ( " ", "", $message->msg ) ); // remove spaces and caps;
 		                                                                     // if no history store msg and return
