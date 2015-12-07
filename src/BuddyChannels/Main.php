@@ -150,7 +150,7 @@ class Main extends PluginBase {
 		if(strtolower($this->read_cfg("read-ranks-from", "none")) == "pureperms") {
 			$rank = $this->purePerms->getUser($player)->getGroup()->getName();
 		}
-		print_r( $this->rankOverrides->data );
+
 		if( $this->read_cfg ( "use-rank-override", false ) ) {
 			if(isset($this->rankOverrides->data[strtolower($playername)])) {
 				$rank = $this->rankOverrides->data[strtolower($playername)];

@@ -18,6 +18,5 @@ class RankOverrides extends Task {
     
     public function onRun($currenttick) {
 		$this->data = $this->database->db_readRankOverrides();
-		print_r($this->data);
     }
 }
