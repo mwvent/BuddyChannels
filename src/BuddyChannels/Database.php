@@ -275,7 +275,7 @@ class Database {
 			$thisQueryName = "readRankOverrides";
 			$sql = "SELECT `username`, `customRankFormattedName` 
 					FROM `" . $this->tables ["rank-override-table"] . "`
-					WHERE `customRankExpires` > UNIX_TIMESTAMP(now());";
+					WHERE `customRankExpires` > UNIX_TIMESTAMP(now()) AND useCustomRank=true;";
 			$this->checkPreparedStatement ( $thisQueryName, $sql );
 		}
 		
