@@ -265,6 +265,11 @@ class MessageFormatter {
 				"uck" 
 		);
 		
+		// add fuc to permittedVariations only if 'if u c' is present in string
+		if( strpos(strtolower($msg), "if u c")  !== false ) {
+			$permittedVariations[] = "fuc";
+		}
+		
 		$colourCodes = str_split ( "1234567890abcdefghijklmnopqrstuvwxyz" );
 		foreach ( $colourCodes as $key => $code ) {
 			$colourCodes [$key] = "&" . $code;
@@ -294,6 +299,10 @@ class MessageFormatter {
 		$badwordlist [] = "f***";
 		$badwordlist [] = "s***";
 		
+		$exactMatchesOnly = array();
+		$exactMatchesOnly [] = "sex";
+		$exactMatchesOnly [] = "fcuk";
+		
 		// replace caps
 		$msg = strtolower ( $msg );
 		// replace l33t chars
@@ -314,6 +323,12 @@ class MessageFormatter {
 		$msg_words [] = str_replace ( " ", "", $msg );
 		// add entry with i's replaced by 1s
 		$msg_words [] = str_replace ( "i", "1", str_replace ( " ", "", $msg ) );
+		
+		foreach ( $exactMatchesOnly as $exactMatchWord) {
+			if (in_array ( $exactMatchWord, $msg_words )) {
+				return true;
+			}
+		}
 		
 		foreach ( $badwordlist as $badword ) {
 			$badword = strtolower ( $badword );
