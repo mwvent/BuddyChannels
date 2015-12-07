@@ -27,6 +27,9 @@ class Main extends PluginBase {
     public $website;
     public $messageFormatter;
     public $readForeignMessagesTask;
+	public $purePerms;
+	
+	public $rankOverrides;
 	
     public function onEnable() {
         @mkdir($this->getDataFolder());
@@ -35,32 +38,51 @@ class Main extends PluginBase {
         $this->getCommand("shout")->setExecutor(new Commands\Commands($this));
         $this->getCommand("block")->setExecutor(new Commands\Commands($this));
         $this->getCommand("unblock")->setExecutor(new Commands\Commands($this));
-	$this->getServer()->getPluginManager()->registerEvents(new EventListener($this), $this);
-	$this->website = $this->read_cfg("website");
-	$this->database = new \BuddyChannels\Database($this);
+		$this->getServer()->getPluginManager()->registerEvents(new EventListener($this), $this);
+		$this->website = $this->read_cfg("website");
+		$this->database = new \BuddyChannels\Database($this);
+		
+		if(strtolower($this->read_cfg("read-ranks-from", "none")) == "pureperms") {
+			if(($plugin = $this->getServer()->getPluginManager()->getPlugin("PurePerms")) !== null){
+				$this->purePerms = $plugin;
+				$this->getLogger()->info("Successfully loaded with PurePerms");
+			}else{
+				$this->getLogger()->alert("Dependency PurePerms not found");
+				$this->getServer()->getPluginManager()->disablePlugin($this);
+				return;
+			}
+		}
+		
+		if( $this->read_cfg ( "use-rank-override", false ) ) {
+			$this->rankOverrides = new \BuddyChannels\Tasks\RankOverrides($this);
+			$rate_aprox_seconds = 5; // TODO assuming second is rougthly 20 ticks need to add this to the config file too
+			$this->getServer()->getScheduler()->scheduleRepeatingTask($this->rankOverrides, $rate_aprox_seconds * 20);
+		}
 	
-	if( $this->read_cfg("use-wordlist-censor", false) ) {
-	    $badWordList = file($this->getDataFolder() . "/badwords.txt", FILE_IGNORE_NEW_LINES);
-	} else {
-	    $badWordList = array();
+		if( $this->read_cfg("use-wordlist-censor", false) ) {
+			$badWordList = file($this->getDataFolder() . "/badwords.txt", FILE_IGNORE_NEW_LINES);
+		} else {
+			$badWordList = array();
+		}
+		
+		$this->messageFormatter = new \BuddyChannels\MessageFormatter(
+			$this->read_cfg("use-spamfilter", false),
+			$this->read_cfg("spamfilter-time-interval", 60),
+			$this->read_cfg("spamfilter-max-duplicates-per-interval", 2),
+			$this->read_cfg("spamfilter-max-messages-per-interval", 6),
+			$this->read_cfg("swearing-is-immature", false),
+			$this->read_cfg("swearing-is-immature-punishment-period", 60),
+			$this->read_cfg("use-wordlist-censor", false),
+			$badWordList
+		);
+		
+		if( $this->read_cfg("connect-server-chat", false) ) {
+			$this->readForeignMessagesTask = new \BuddyChannels\Tasks\ReadForeignMessagesTask($this);
+			$rate_aprox_seconds = 5; // TODO assuming second is rougthly 20 ticks need to add this to the config file too
+			$this->getServer()->getScheduler()->scheduleRepeatingTask($this->readForeignMessagesTask, $rate_aprox_seconds * 20);
+		}
 	}
 	
-	$this->messageFormatter = new \BuddyChannels\MessageFormatter(
-	    $this->read_cfg("use-spamfilter", false),
-	    $this->read_cfg("spamfilter-time-interval", 60),
-	    $this->read_cfg("spamfilter-max-duplicates-per-interval", 2),
-	    $this->read_cfg("spamfilter-max-messages-per-interval", 6),
-	    $this->read_cfg("swearing-is-immature", false),
-	    $this->read_cfg("swearing-is-immature-punishment-period", 60),
-	    $this->read_cfg("use-wordlist-censor", false),
-	    $badWordList
-	);
-	
-	$this->readForeignMessagesTask = new \BuddyChannels\Tasks\ReadForeignMessagesTask($this);
-	$rate_aprox_seconds = 5; // TODO assuming second is rougthly 20 ticks need to add this to the config file too
-	$this->getServer()->getScheduler()->scheduleRepeatingTask($this->readForeignMessagesTask, $rate_aprox_seconds * 20);
-    }
-
     public static function translateColors($symbol, $message) {
 	$message = str_replace($symbol."0", TextFormat::BLACK, $message);
 	$message = str_replace($symbol."1", TextFormat::DARK_BLUE, $message);
@@ -121,46 +143,50 @@ class Main extends PluginBase {
     }
     
     public function getUserRank($playername) {
-	// TODO very hacky! - should get data from pureperms plugin, should have a range of classes selectable
-	// by config for supporting other plugins
-	if($this->read_cfg("read-ranks-from", "none") != "pureperms") {
-	    return "";
-	}
-	$playername = strtolower($playername);
-	$purePermsPlayersFolder = $this->getDataFolder() . "/../PurePerms/players";
-	
-	$rank_yml_cmd = "cat \"$purePermsPlayersFolder/$playername.yml\" | grep \"group: \" | cut -d\" \" -f2 | head -n 1 | xargs printf";
-	$rank = exec($rank_yml_cmd);
-	if($rank == "") {
-		    return "";
-	}
-	switch(strtolower($rank)) {
-	    case "newbie":
-		$rank_formatted = "&6[Newbie]";
-		break;
-	    case "junior":
-	        $rank_formatted = "&b[Junior]";
-		break;
-	    case "senior":
-		$rank_formatted = "&1[Senior]";
-		break;
-	    case "elder":
-		$rank_formatted = "&c[Elder]";
-		break;
-	    case "youtuber":
-                $rank_formatted = "&c[&dYou&fTuber&c]";
-                break;
-	    case "admin":
-                $rank_formatted = "&c[&4Admin&c]";
-                break;
-	    case "owner":
-		$rank_formatted = "&c[&6E&7n&8g&9i&an&be&ce&dr&c]";
-		break;
-	    default:
-		$rank_formatted = "&c[" . $rank . "]";
-		break;
-	}
-	return $rank_formatted;
+		$player = $this->getServer()->getPlayer($playername);
+        $player = $player instanceof Player ? $player : $this->getServer()->getOfflinePlayer($playername);
+		$rank = "";
+		
+		if(strtolower($this->read_cfg("read-ranks-from", "none")) == "pureperms") {
+			$rank = $this->purePerms->getUser($player)->getGroup()->getName();
+		}
+		print_r( $this->rankOverrides->data );
+		if( $this->read_cfg ( "use-rank-override", false ) ) {
+			if(isset($this->rankOverrides->data[strtolower($playername)])) {
+				$rank = $this->rankOverrides->data[strtolower($playername)];
+			}
+		}
+		
+		switch(strtolower($rank)) {
+			case "":
+				return "";
+				break;
+			case "newbie":
+				$rank_formatted = "&6[Newbie]";
+				break;
+			case "junior":
+				$rank_formatted = "&b[Junior]";
+			break;
+			case "senior":
+				$rank_formatted = "&1[Senior]";
+				break;
+			case "elder":
+				$rank_formatted = "&c[Elder]";
+				break;
+			case "youtuber":
+				$rank_formatted = "&c[&dYou&fTuber&c]";
+				break;
+			case "admin":
+				$rank_formatted = "&c[&4Admin&c]";
+				break;
+			case "owner":
+				$rank_formatted = "&c[&6E&7n&8g&9i&an&be&ce&dr&c]";
+				break;
+			default:
+				$rank_formatted = "&c[&f" . $rank . "&c]";
+				break;
+		}
+		return $rank_formatted;
     }
  
     public function processNewMessage(Player $player, $message, $shouting = false) {

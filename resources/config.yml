@@ -14,6 +14,9 @@ mysql-pass: password
 database: pocketmine
 # player ranks datasource - currentley supported values are none and pureperms
 read-ranks-from: none
+# use a rank override db table 
+use-rank-override: false
+rank-override-table: custom-ranks
 # tables created by buddypress - you may be using a prefix
 buddypress-bp_groups_members-tablename: bp_groups_members
 buddypress-bp_groups-tablename: bp_groups

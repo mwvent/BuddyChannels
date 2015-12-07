@@ -31,6 +31,11 @@ class Database {
 				"servers" => $this->plugin->read_cfg ( "buddychannels-servers-table" ),
 				"usermeta" => $this->plugin->read_cfg ( "buddychannels-user-meta-table" ) 
 		);
+		
+		if($this->plugin->read_cfg ( "use-rank-override", false ) ) {
+			$this->tables["rank-override-table"] = $this->plugin->read_cfg ( "rank-override-table" );
+		} 
+		
 		// try and open connection
 		$this->db = new \mysqli ( $this->plugin->read_cfg ( "mysql-server" ), $this->plugin->read_cfg ( "mysql-user" ), $this->plugin->read_cfg ( "mysql-pass" ), $this->plugin->read_cfg ( "database" ) );
 		if ($this->db->connect_errno) {
@@ -93,6 +98,17 @@ class Database {
 		`servername` = '" . $this->db->real_escape_string ( $this->plugin->read_cfg ( "server-name", "untitled" ) ) . "',
 		`connect_chat` = '" . $this->db->real_escape_string ( $this->plugin->read_cfg ( "connect-server-chat", false ) ) . "'
 	    ;";
+		
+		if($this->plugin->read_cfg ( "use-rank-override", false ) ) {
+			$db_setup_queries ["create buddychat rank override table"] = "
+			 CREATE TABLE IF NOT EXISTS `" . $this->tables ["rank-override-table"] . "` (
+				`username` VARCHAR(50),
+				`useCustomRank` INT,
+				`customRankExpires` BIGINT,
+				`customRankNiceName` VARCHAR(50),
+				`customRankFormattedName` VARCHAR(50)
+				);";
+		}
 		
 		$setup_optimisations_ignore_errors = array (
 				"CREATE INDEX `messagetime` ON `" . $this->tables ["chatlog"] . "` (messagetime);",
@@ -254,7 +270,17 @@ class Database {
 		    `" . $this->tables ["chatlog"] . "`.`messagetime` DESC
 		LIMIT 1;";
 		$this->checkPreparedStatement ( $thisQueryName, $sql );
+		
+		if($this->plugin->read_cfg ( "use-rank-override", false ) ) {
+			$thisQueryName = "readRankOverrides";
+			$sql = "SELECT `username`, `customRankFormattedName` 
+					FROM `" . $this->tables ["rank-override-table"] . "`
+					WHERE `customRankExpires` > UNIX_TIMESTAMP(now());";
+			$this->checkPreparedStatement ( $thisQueryName, $sql );
+		}
+		
 	}
+	
 	public function db_getUserMeta($username, $forceReload = false) {
 		$username_lower = strtolower ( $username );
 		// if data is already set and forceReload is not required then return cached
@@ -561,6 +587,35 @@ class Database {
 		$this->db_statements [$thisQueryName]->free_result ();
 		return $newmessages;
 	}
+	
+	public function db_readRankOverrides() {
+		if( ! $this->plugin->read_cfg ( "use-rank-override", false ) ) {
+			return [];
+		}
+		// read new messages
+		$thisQueryName = "readRankOverrides";
+		
+		$result = $this->db_statements [$thisQueryName]->execute ();
+		if (! $result) {
+			$this->criticalError ( "Database error executing " . $thisQueryName . " " . $this->db_statements [$thisQueryName]->error );
+			return array ();
+		}
+		
+		$result = $this->db_statements [$thisQueryName]->bind_result ( $username, $customrank );
+		if ($result === false) {
+			$this->criticalError ( "Failed to bind result " . $thisQueryName . ": " . $this->db_statements [$thisQueryName]->error );
+			return array ();
+		}
+		
+		$customRanks = array ();
+		while ( $this->db_statements [$thisQueryName]->fetch () ) {
+			$customRanks[$username] = $customrank;
+		}
+		$this->db_statements [$thisQueryName]->free_result ();
+		
+		return $customRanks;
+	}
+	
 	public function read_cached_user_channels($username) {
 		if (isset ( $this->cached_user_channels [$username] )) {
 			return $this->cached_user_channels [$username];
