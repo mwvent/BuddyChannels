@@ -59,7 +59,7 @@ class MessageFormatter {
 		}
 		$captials_percent = ( $captials_count / $all_letters_count );
 		
-		if( $captials_percent > 0.9 ) {
+		if( $captials_percent > 0.6 ) {
 			$message->msgs_info [] = "&3Is your caps lock stuck?";
 			$message->msg = strtolower( $message->msg );
 		}
