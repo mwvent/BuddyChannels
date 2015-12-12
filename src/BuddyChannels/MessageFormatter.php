@@ -296,8 +296,6 @@ class MessageFormatter {
 		$badwordlist [] = "cunt";
 		$badwordlist [] = "nigger";
 		$badwordlist [] = "nigga";
-		$badwordlist [] = "f***";
-		$badwordlist [] = "s***";
 		
 		$exactMatchesOnly = array();
 		$exactMatchesOnly [] = "sex";
@@ -313,6 +311,13 @@ class MessageFormatter {
 		$exactMatchesOnly [] = "fuqing";
 		$exactMatchesOnly [] = "baitach";
 		$exactMatchesOnly [] = "taits";
+		// where users have used asterixes
+		$exactMatchesOnly [] = "f";
+		$exactMatchesOnly [] = "fk";
+		$exactMatchesOnly [] = "s";
+		$exactMatchesOnly [] = "dic";
+		$exactMatchesOnly [] = "bih";
+		$exactMatchesOnly [] = "bitc";
 		
 		// replace caps
 		$msg = strtolower ( $msg );
