@@ -302,6 +302,17 @@ class MessageFormatter {
 		$exactMatchesOnly = array();
 		$exactMatchesOnly [] = "sex";
 		$exactMatchesOnly [] = "fcuk";
+		$exactMatchesOnly [] = "fuk";
+		$exactMatchesOnly [] = "fack";
+		$exactMatchesOnly [] = "feck";
+		$exactMatchesOnly [] = "fuq";
+		$exactMatchesOnly [] = "fcuking";
+		$exactMatchesOnly [] = "fuking";
+		$exactMatchesOnly [] = "facking";
+		$exactMatchesOnly [] = "fecking";
+		$exactMatchesOnly [] = "fuqing";
+		$exactMatchesOnly [] = "baitach";
+		$exactMatchesOnly [] = "taits";
 		
 		// replace caps
 		$msg = strtolower ( $msg );
@@ -312,17 +323,24 @@ class MessageFormatter {
 		$msg = str_replace ( "5", "s", $msg );
 		$msg = str_replace ( "7", "t", $msg );
 		$msg = str_replace ( "8", "ate", $msg );
+		// replace accented and special characters that can get used to sub letters by users
+		$accented_reps = array(    'Š'=>'S', 'š'=>'s', 'Ž'=>'Z', 'ž'=>'z', 'À'=>'A', 'Á'=>'A', 'Â'=>'A', 'Ã'=>'A', 'Ä'=>'A', 'Å'=>'A', 'Æ'=>'A', 'Ç'=>'C', 'È'=>'E', 'É'=>'E', 'Ê'=>'E', 'Ë'=>'E', 'Ì'=>'I', 'Í'=>'I', 'Î'=>'I', 'Ï'=>'I', 'Ñ'=>'N', 'Ò'=>'O', 'Ó'=>'O', 'Ô'=>'O', 'Õ'=>'O', 'Ö'=>'O', 'Ø'=>'O', 'Ù'=>'U', 'Ú'=>'U', 'Û'=>'U', 'Ü'=>'U', 'Ý'=>'Y', 'Þ'=>'B', 'ß'=>'Ss', 'à'=>'a', 'á'=>'a', 'â'=>'a', 'ã'=>'a', 'ä'=>'a', 'å'=>'a', 'æ'=>'a', 'ç'=>'c', 'è'=>'e', 'é'=>'e', 'ê'=>'e', 'ë'=>'e', 'ì'=>'i', 'í'=>'i', 'î'=>'i', 'ï'=>'i', 'ð'=>'o', 'ñ'=>'n', 'ò'=>'o', 'ó'=>'o', 'ô'=>'o', 'õ'=>'o', 'ö'=>'o', 'ø'=>'o', 'ù'=>'u', 'ú'=>'u', 'û'=>'u', 'ý'=>'y', 'þ'=>'b', 'ÿ'=>'y' );
+		$msg = strtr( $msg, $accented_reps );
 		// replace codes
 		$msg = str_replace ( $colourCodes, "", $msg );
 		// replace some pronouns
 		$msg = str_replace ( "you", "", $msg );
 		// take out non alphanumeric chars
 		$msg = preg_replace ( '/[^a-z\d ]/i', '', $msg );
+		
+		// break down msg into words
 		$msg_words = explode ( " ", $msg );
 		// add an entry with the spaces taken out
 		$msg_words [] = str_replace ( " ", "", $msg );
 		// add entry with i's replaced by 1s
 		$msg_words [] = str_replace ( "i", "1", str_replace ( " ", "", $msg ) );
+		
+		echo "DEBUG: $msg";
 		
 		foreach ( $exactMatchesOnly as $exactMatchWord) {
 			if (in_array ( $exactMatchWord, $msg_words )) {
