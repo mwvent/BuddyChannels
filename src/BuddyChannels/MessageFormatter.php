@@ -345,8 +345,6 @@ class MessageFormatter {
 		// add entry with i's replaced by 1s
 		$msg_words [] = str_replace ( "i", "1", str_replace ( " ", "", $msg ) );
 		
-		echo "DEBUG: $msg";
-		
 		foreach ( $exactMatchesOnly as $exactMatchWord) {
 			if (in_array ( $exactMatchWord, $msg_words )) {
 				return true;
