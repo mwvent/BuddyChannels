@@ -22,6 +22,7 @@ buddypress-bp_groups_members-tablename: bp_groups_members
 buddypress-bp_groups-tablename: bp_groups
 # tables created by wordpress - you be using a prefix
 wordpress-users-tablename: users
+buddypress-activity-tablename: bp_activity
 # tables that will be created and belong to buddychannels
 buddychannels-users-table: buddychannels_users
 buddychannels-servers-table: buddychannels_servers
@@ -47,4 +48,17 @@ use-wordlist-censor: false
 # uses website setting about for making chat messages
 use-rss: false
 rss-url: "https://YOUR.SITE/rssfeed"
+# use website advertisements
+use-website-advertisements: true
+# don't send user a website advertisment if they have logged in the last x hours
+leave-alone-period: 12
+# how often to advertise in approximate seconds ( *20 ticks )
+ad-freq: 120
+# advertisement messages - use the <WEBSITE> tag to replace with the website setting above
+ad-messages:
+  - "&fYou havent visited the website for a while! Please visit &d<WEBSITE> &f for chat, post pictures and activate pets and custom ranks. Everything is &4FREE! Plus get rid of these annoying messages for a while &6;-)"
+  - "&fWe miss you on &d<WEBSITE> &ffor our &4FREE &fsocial network, pets and custom ranks. Plus get rid of these annoying messages for a while &6;-P"
+  - "&fPlease come (re)visit &d<WEBSITE>&f! &4FREE &4FREE &4FREE - &fsocial network, pets, custom ranks. And get rid of these annoying messages for a while &6;-D"
+  - "&fDid we mention our awesome website?? - &d<WEBSITE>&f! Come login with your player name and password + removes these annoying messages for a while &6;-O"
+  - "&fPlease come visit &d<WEBSITE>&f! This server is paid at no cost to you by website advertisements every page you view supports the server. Plus you rid of these annoying messages for a while &68-)"
 ...

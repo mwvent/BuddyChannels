@@ -29,6 +29,7 @@ class Main extends PluginBase {
     public $readForeignMessagesTask;
 	public $purePerms;
 	public $readRSSTask;
+	public $websiteAdvertisementTask;
 	
 	public $rankOverrides;
 	
@@ -88,6 +89,18 @@ class Main extends PluginBase {
 			$rate_aprox_seconds = 5; // TODO assuming second is rougthly 20 ticks need to add this to the config file too
 			$this->getServer()->getScheduler()->scheduleRepeatingTask(
 				$this->readRSSTask, $rate_aprox_seconds * 20
+			);
+		}
+		
+		if( $this->read_cfg("use-website-advertisements", false) ) {
+			$leavealoneperiod = $this->read_cfg("leave-alone-period");
+			$ads = $this->read_cfg("ad-messages");
+			$this->websiteAdvertisementTask = new \BuddyChannels\Tasks\WebsiteAdvertisementTask(
+				$this, $this->website, $ads, $leavealoneperiod
+			);
+			$rate_aprox_seconds = $this->read_cfg("ad-freq");
+			$this->getServer()->getScheduler()->scheduleRepeatingTask(
+				$this->websiteAdvertisementTask, $rate_aprox_seconds * 20
 			);
 		}
 	}

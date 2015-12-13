@@ -25,6 +25,7 @@ class Database {
 		$this->tables = array (
 				"bpgroupmembers" => $this->plugin->read_cfg ( "buddypress-bp_groups_members-tablename" ),
 				"bpgroups" => $this->plugin->read_cfg ( "buddypress-bp_groups-tablename" ),
+				"bpactivity" => $this->plugin->read_cfg ( "buddypress-activity-tablename" ),
 				"wpusers" => $this->plugin->read_cfg ( "wordpress-users-tablename" ),
 				"bcusers" => $this->plugin->read_cfg ( "buddychannels-users-table" ),
 				"chatlog" => $this->plugin->read_cfg ( "buddychannels-chatlog-table" ),
@@ -279,6 +280,49 @@ class Database {
 			$this->checkPreparedStatement ( $thisQueryName, $sql );
 		}
 		
+		$thisQueryName = "getActiveWebsiteUsers";
+		$sql = "SELECT `user_nicename`
+				FROM `" . $this->tables ["bpactivity"] ."` 
+				INNER JOIN `" . $this->tables ["wpusers"] ."`  
+					ON `" . $this->tables ["bpactivity"] ."`.`user_id`
+							= `" . $this->tables ["wpusers"] ."`.`ID`
+				WHERE 
+					`date_recorded` > DATE_SUB(NOW(), INTERVAL ? HOUR) 
+					AND type='last_activity';
+		";
+		$this->checkPreparedStatement ( $thisQueryName, $sql );
+	}
+	
+	public function db_getActiveWebsiteUsers($hoursToCheck = 12) {
+		$thisQueryName = "getActiveWebsiteUsers";
+		
+		$result = $this->db_statements [$thisQueryName]->bind_param ( "i", $hoursToCheck );
+		if ($result === false) {
+			$this->criticalError ( "Failed to bind to statement " . $thisQueryName . ": " . $this->db_statements [$thisQueryName]->error );
+			return array ();
+		}
+		
+		$result = $this->db_statements [$thisQueryName]->execute ();
+		if (! $result) {
+			$this->criticalError ( "Database error executing " . $thisQueryName . " " . $this->db_statements [$thisQueryName]->error );
+			@$this->db_statements [$thisQueryName]->free_result ();
+			return false;
+		}
+		
+		$result = $this->db_statements [$thisQueryName]->bind_result ( $playerName );
+		if ($result === false) {
+			$this->criticalError ( "Failed to bind result " . $thisQueryName . ": " . $this->db_statements [$thisQueryName]->error );
+			return false;
+		}
+		
+		$returnArray = array ();
+		while ( $this->db_statements [$thisQueryName]->fetch () ) {
+			$returnArray[$playerName] = $playerName;
+		}
+
+		@$this->db_statements [$thisQueryName]->free_result ();
+		
+		return $returnArray;
 	}
 	
 	public function db_getUserMeta($username, $forceReload = false) {
