@@ -98,17 +98,19 @@ class ReadRSSTask extends Task {
 				$this->last_known_timestamp = $cur_timestamp;
 			}
 			if( ! $this->firstRun ) {
+				// READMORE IS [&#133;]
+				$cur_msg = "&f" . str_replace( "[&#133;]", "&1... read more on the website " . $this->website, $cur_msg);
 				$currentMessage = new \BuddyChannels\ForeignMessage(
 					-1, // serverid
 					$this->website, // servername
 					"", // username
 					"", // userrank
 					0, // channel number
-					"Public", // channel name 
+					"Public", // channel name
 					$cur_msg, // msg 
 					true // shout
 				);
-				// echo "DEBUG: Making new BuddyChannels Msg for $cur_msg \n";
+				echo "DEBUG: Making new BuddyChannels Msg for $cur_msg \n";
 				$newSMTask = new \BuddyChannels\Tasks\SendMessageTask($currentMessage, $this->plugin);
 			}
 		}
