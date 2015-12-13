@@ -314,7 +314,6 @@ class MessageFormatter {
 		// where users have used asterixes
 		$exactMatchesOnly [] = "f";
 		$exactMatchesOnly [] = "fk";
-		$exactMatchesOnly [] = "s";
 		$exactMatchesOnly [] = "dic";
 		$exactMatchesOnly [] = "bih";
 		$exactMatchesOnly [] = "bitc";
