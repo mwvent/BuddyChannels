@@ -42,4 +42,9 @@ swearing-is-immature-punishment-period: 60
 # dumb swear filter - censors patterns from the badwords.txt list
 # no punishment due to high potential of false positives
 use-wordlist-censor: false
+# rss input
+# for posting website updates as a message in the game
+# uses website setting about for making chat messages
+use-rss: false
+rss-url: "https://YOUR.SITE/rssfeed"
 ...

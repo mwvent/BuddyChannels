@@ -312,9 +312,9 @@ class MessageFormatter {
 		$exactMatchesOnly [] = "baitach";
 		$exactMatchesOnly [] = "taits";
 		// where users have used asterixes
-		//$exactMatchesOnly [] = "f";
+		$exactMatchesOnly [] = "f";
 		$exactMatchesOnly [] = "fk";
-		//$exactMatchesOnly [] = "s";
+		$exactMatchesOnly [] = "s";
 		$exactMatchesOnly [] = "dic";
 		$exactMatchesOnly [] = "bih";
 		$exactMatchesOnly [] = "bitc";

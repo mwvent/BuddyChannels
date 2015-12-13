@@ -28,6 +28,7 @@ class Main extends PluginBase {
     public $messageFormatter;
     public $readForeignMessagesTask;
 	public $purePerms;
+	public $readRSSTask;
 	
 	public $rankOverrides;
 	
@@ -80,6 +81,14 @@ class Main extends PluginBase {
 			$this->readForeignMessagesTask = new \BuddyChannels\Tasks\ReadForeignMessagesTask($this);
 			$rate_aprox_seconds = 5; // TODO assuming second is rougthly 20 ticks need to add this to the config file too
 			$this->getServer()->getScheduler()->scheduleRepeatingTask($this->readForeignMessagesTask, $rate_aprox_seconds * 20);
+		}
+		
+		if( $this->read_cfg("use-rss", false) && ( $this->read_cfg("rss-url", false) !== false )  ) {
+			$this->readRSSTask = new \BuddyChannels\Tasks\ReadRSSTask( $this, $this->read_cfg("rss-url"), $this->website );
+			$rate_aprox_seconds = 5; // TODO assuming second is rougthly 20 ticks need to add this to the config file too
+			$this->getServer()->getScheduler()->scheduleRepeatingTask(
+				$this->readRSSTask, $rate_aprox_seconds * 20
+			);
 		}
 	}
 	
