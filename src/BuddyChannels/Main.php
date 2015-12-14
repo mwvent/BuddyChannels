@@ -37,10 +37,19 @@ class Main extends PluginBase {
         @mkdir($this->getDataFolder());
         $this->saveDefaultConfig();
 		
-		/* override default me command */
+		/* override default commands */
 		$commandMap = $this->getServer()->getCommandMap();
+		
 		$commandToOverride = $commandMap->getCommand("me");
 		$commandToOverride->setLabel("me_disabled"); //This prepares the command for the next step, setting up the Command->nextLabel
+		$commandToOverride->unregister($commandMap); //This changes the current label
+		
+		$commandToOverride = $commandMap->getCommand("tell");
+		$commandToOverride->setLabel("tell_disabled"); //This prepares the command for the next step, setting up the Command->nextLabel
+		$commandToOverride->unregister($commandMap); //This changes the current label
+		
+		$commandToOverride = $commandMap->getCommand("msg");
+		$commandToOverride->setLabel("msg_disabled"); //This prepares the command for the next step, setting up the Command->nextLabel
 		$commandToOverride->unregister($commandMap); //This changes the current label
 		
 		// register Commands
@@ -50,10 +59,15 @@ class Main extends PluginBase {
         $this->getCommand("unblock")->setExecutor(new Commands\Unblock($this));
 	    $this->getCommand("mute")->setExecutor(new Commands\Mute($this));
         $this->getCommand("unmute")->setExecutor(new Commands\Unmute($this));
+		$this->getCommand("tell")->setExecutor(new Commands\Tell($this));
+		
 		// Overrides dont work with setExecutor ( I dont think ) so use commandmap instead
 		$commandMap->register("me", new Commands\Me($this));
 		$commandMap->register("me", new Commands\Me($this), "me");
 		$commandMap->register("me", new Commands\Me($this), "emote");
+		$commandMap->register("tell", new Commands\Tell($this));
+		$commandMap->register("tell", new Commands\Tell($this), "tell");
+		$commandMap->register("tell", new Commands\Tell($this), "msg");
 		
 		$this->getServer()->getPluginManager()->registerEvents(new EventListener($this), $this);
 		$this->website = $this->read_cfg("website");

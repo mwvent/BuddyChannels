@@ -20,9 +20,10 @@ class Message {
     public $msg_echo; // msg to send back to self
     public $msg_samegroup; // msg to send if same non-public group
     public $msg_shouting; // msg to send if shouting from another channel
+	public $msg_private; // msg to send if private
     public $senderChannel_number;
     public $senderChannel_name;
-    public $message_receivers_lcase_usernames;
+    public $message_receivers_lcase_usernames = null;
     public $readyToSend = false;
     
     public function __construct(Player $sender, $senderChannel_number, $senderChannel_name, $userrank, $msg, $shouting) {

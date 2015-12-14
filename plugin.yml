@@ -34,6 +34,10 @@ commands:
    aliases: [emote]
    description: BuddyChannels emote.
    permission: buddychannels.commands.me
+ tell:
+   aliases: [msg]
+   description: BuddyChannels tell.
+   permission: buddychannels.commands.tell
 permissions:
  buddychannels:
   default: true
@@ -72,4 +76,7 @@ permissions:
        default: true
      buddychannels.commands.unmute:
        description: "Buddychannels allow umute public channel"
+       default: true
+     buddychannels.commands.tell:
+       description: "Buddychannels private message"
        default: true

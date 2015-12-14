@@ -166,8 +166,7 @@ class MessageFormatter {
 	}
 	public function newlined_output($tagstring, $msgstartstring, $message) {
 		// not using newlined_output anymore
-		return $tagstring .  "&r&f > &r" . $message;
-		
+		//return $tagstring .  "&r&f > &r" . $message;
 		$max_width = 80;
 		$output_string = $tagstring . " " . $msgstartstring . " ";
 		$output_pos = strlen ( Main::removeColors ( "&", $output_string ) );
@@ -206,6 +205,9 @@ class MessageFormatter {
 		);
 		$tagstring = implode ( "&r&f ", $message_elements_echo );
 		$message->msg_echo = $this->newlined_output ( $tagstring, "&r&a‣&r", $message->msg );
+		
+		// msg_private
+		$message->msg_private = "&l&o" . $message->username . " ---> TO YOU &r&f: " . $message->msg;
 		
 		// same channel
 		$message_elements_samechan = array (
