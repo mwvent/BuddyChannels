@@ -50,12 +50,11 @@ class SendMessageTask extends Task {
 		}
 		if( ! $sent ) {
 			$message->sender->sendMessage(Main::translateColors("&", "&cCould not send the private message"));
-			$message->msg = "failed to PM " . implode( ",", $message->message_receivers_lcase_usernames ) . " : " .  $message->msg;
+			$message->senderChannel_name = "PM FAILED to " . implode( ",", $message->message_receivers_lcase_usernames );
 		} else {
 			$message->sender->sendMessage(
 				Main::translateColors("&", 
 				"&f&l&oYOU ---> " . implode( ",", $message->message_receivers_lcase_usernames ) . "&r&f : " . $message->msg));
-			$message->msg = "send PM to " . implode( ",", $message->message_receivers_lcase_usernames ) . " : " .  $message->msg;
 		}
 	}
 	

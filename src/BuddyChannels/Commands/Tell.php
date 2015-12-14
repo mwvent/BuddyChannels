@@ -39,12 +39,10 @@ class Tell extends Command implements CommandExecutor {
 		    $player_name = strtolower($player->getName());
 		}
 		
-		/*
 		if(strtolower($player_name) === strtolower($sender->getName())){
 		    $sender->sendMessage(TextFormat::RED . "[Error] You can't PM yourself silly :-)");
 		    return false;
 		}
-		*/
 		
 		if( ! isset($args[1]) ) {
 			$sender->sendMessage($this->plugin->translateColors("&", "&cUsage: /tell <player> <msg>"));
@@ -53,13 +51,11 @@ class Tell extends Command implements CommandExecutor {
 		
 		$player = $sender;
 		$username = strtolower($player->getName());
-		$userchannel_number = $this->plugin->database->read_cached_user_channels($username);
-		$userchannel_name = $this->plugin->database->read_cached_channelNames($userchannel_number);
 		$username_lcase = strtolower($player->getName());
 		$message = new \BuddyChannels\Message(
 			$player,
-			$userchannel_number, // channel number
-			$userchannel_name, // channel name
+			-1, // channel number
+			"PM to " . $player_name, // channel name
 			$this->plugin->getPlayerRank($player),
 			implode(" ", array_slice($args,1)),
 			true // shouting
