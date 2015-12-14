@@ -41,8 +41,9 @@ class WebsiteAdvertisementTask extends Task {
 		$adMessage = $this->getNextAdMessage();
 		foreach($this->plugin->getServer ()->getOnlinePlayers() as $currentPlayer) {
 			$currentPlayerName = strtolower($currentPlayer->getName());
+			$currentAdMessage = str_replace( "<PLAYER>", $currentPlayerName, $adMessage);
 			if( ! in_array( $currentPlayerName, $activeUsers ) ) {
-				$currentPlayer->sendMessage(Main::translateColors("&",$adMessage));
+				$currentPlayer->sendMessage(Main::translateColors("&", $currentAdMessage));
 				$userNamesSentTo[] = $currentPlayerName;
 			}
 		}
