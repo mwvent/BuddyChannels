@@ -165,6 +165,9 @@ class MessageFormatter {
 		$message->msg = str_ireplace ( $this->badWordList, "*", $message->msg );
 	}
 	public function newlined_output($tagstring, $msgstartstring, $message) {
+		// not using newlined_output anymore
+		return $tagstring .  "&r&f > &r" . $message;
+		
 		$max_width = 80;
 		$output_string = $tagstring . " " . $msgstartstring . " ";
 		$output_pos = strlen ( Main::removeColors ( "&", $output_string ) );
@@ -222,6 +225,24 @@ class MessageFormatter {
 		);
 		$tagstring = implode ( "&r&f ", $message_elements_shout );
 		$message->msg_shouting = $this->newlined_output ( $tagstring, "&r&a‣&r", $message->msg );
+		
+		// emoting
+		if( substr( $message->msg , 0 , 1 ) == "#" ) {
+			$message_elements_emoting = array (
+					$message->userrank,
+					$message->username 
+			);
+			$message_elements_emoting_echo = array (
+					$message->userrank,
+					"YOU" 
+			);
+			$tagstring = " * " . implode ( "&l&o&r&f ", $message_elements_emoting );
+			$tagstring_echo = " &l&o* " . implode ( "&l&o&r&f ", $message_elements_emoting_echo );
+			// override other formats if emoting
+			$message->msg_shouting = $tagstring . " &l&o" . substr( $message->msg , 1);
+			$message->msg_samegroup = $tagstring . " &l&o" . substr( $message->msg , 1);
+			$message->msg_echo = $tagstring_echo . " &l&o" .substr( $message->msg , 1);
+		}
 	}
 	public function hasVeryBadLanguage($msg) {
 		// try some regexps 1st

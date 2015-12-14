@@ -22,6 +22,18 @@ commands:
    aliases: [unblk]
    description: BuddyChannels unblock user from (your) chat.
    permission: buddychannels.commands.unblock
+ mute:
+   aliases: []
+   description: BuddyChannels mute the public channel (if you are in your own channel).
+   permission: buddychannels.commands.mute
+ unmute:
+   aliases: []
+   description: BuddyChannels unmute the public channel (if you are in your own channel).
+   permission: buddychannels.commands.unmute
+ me:
+   aliases: [emote]
+   description: BuddyChannels emote.
+   permission: buddychannels.commands.me
 permissions:
  buddychannels:
   default: true
@@ -45,10 +57,19 @@ permissions:
       default: true
      buddychannels.commands.shout:
       default: true
-      description: "Buddychannels shout"
+      description: "Buddychannels allow shouting"
      buddychannels.commands.block:
-       description: "Buddychannels block"
+       description: "Buddychannels allow block another user"
        default: true
      buddychannels.commands.unblock:
-       description: "Buddychannels unblock"
+       description: "Buddychannels allow unblock another user"
+       default: true
+     buddychannels.commands.me:
+       description: "Buddychannels use me command to emote"
+       default: true
+     buddychannels.commands.mute:
+       description: "Buddychannels allow mute public channel"
+       default: true
+     buddychannels.commands.unmute:
+       description: "Buddychannels allow umute public channel"
        default: true

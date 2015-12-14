@@ -36,10 +36,25 @@ class Main extends PluginBase {
     public function onEnable() {
         @mkdir($this->getDataFolder());
         $this->saveDefaultConfig();
-        $this->getCommand("buddychannels")->setExecutor(new Commands\Commands($this));
-        $this->getCommand("shout")->setExecutor(new Commands\Commands($this));
-        $this->getCommand("block")->setExecutor(new Commands\Commands($this));
-        $this->getCommand("unblock")->setExecutor(new Commands\Commands($this));
+		
+		/* override default me command */
+		$commandMap = $this->getServer()->getCommandMap();
+		$commandToOverride = $commandMap->getCommand("me");
+		$commandToOverride->setLabel("me_disabled"); //This prepares the command for the next step, setting up the Command->nextLabel
+		$commandToOverride->unregister($commandMap); //This changes the current label
+		
+		// register Commands
+        $this->getCommand("buddychannels")->setExecutor(new Commands\BuddyChannels($this));
+        $this->getCommand("shout")->setExecutor(new Commands\Shout($this));
+        $this->getCommand("block")->setExecutor(new Commands\Block($this));
+        $this->getCommand("unblock")->setExecutor(new Commands\Unblock($this));
+	    $this->getCommand("mute")->setExecutor(new Commands\Mute($this));
+        $this->getCommand("unmute")->setExecutor(new Commands\Unmute($this));
+		// Overrides dont work with setExecutor ( I dont think ) so use commandmap instead
+		$commandMap->register("me", new Commands\Me($this));
+		$commandMap->register("me", new Commands\Me($this), "me");
+		$commandMap->register("me", new Commands\Me($this), "emote");
+		
 		$this->getServer()->getPluginManager()->registerEvents(new EventListener($this), $this);
 		$this->website = $this->read_cfg("website");
 		$this->database = new \BuddyChannels\Database($this);
