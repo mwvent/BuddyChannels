@@ -253,6 +253,7 @@ class Database {
 		    `" . $this->tables ["chatlog"] . "`.`serverid` != '" . $this->db->real_escape_string ( $this->plugin->read_cfg ( "server-id", 0 ) ) . "'
 		    AND `messagetime` > ?
 		    AND `connect_chat`=true
+			AND `" . $this->tables ["chatlog"] . "`.`channel` > -1
 		ORDER BY
 		    `" . $this->tables ["chatlog"] . "`.`messagetime` ASC;";
 		$this->checkPreparedStatement ( $thisQueryName, $sql );
