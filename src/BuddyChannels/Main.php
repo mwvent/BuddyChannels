@@ -199,7 +199,8 @@ class Main extends PluginBase {
 		$rank = "";
 		
 		if(strtolower($this->read_cfg("read-ranks-from", "none")) == "pureperms") {
-			$rank = $this->purePerms->getUser($player)->getGroup()->getName();
+			// $rank = $this->purePerms->getUser($player)->getGroup()->getName();
+                        $rank = $this->purePerms->getUserDataMgr()->getGroup($player)->getName();
 		}
 
 		if( $this->read_cfg ( "use-rank-override", false ) ) {
