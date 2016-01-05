@@ -167,7 +167,7 @@ class MessageFormatter {
 	public function newlined_output($tagstring, $msgstartstring, $message) {
 		// not using newlined_output anymore
 		//return $tagstring .  "&r&f > &r" . $message;
-		$max_width = 80;
+		$max_width = 75;
 		$output_string = $tagstring . " " . $msgstartstring . " ";
 		$output_pos = strlen ( Main::removeColors ( "&", $output_string ) );
 		$message_words = explode ( " ", $message );
@@ -193,7 +193,7 @@ class MessageFormatter {
 		}
 		
 		$servername_formatted = "";
-		if (! is_null ( $message->serverid )) {
+		if ( ! $message->server_name == "" ) {
 			$servername_formatted = "&o&n&8@" . $message->server_name;
 		}
 		

@@ -6,6 +6,9 @@ use pocketmine\Player;
 class Message {
     public $serverid = null; // only set when coming from another server
     public $server_name = "";
+    /**
+     * @var Player
+     */
     public $sender;
     public $username;
     public $username_lower;
@@ -20,7 +23,7 @@ class Message {
     public $msg_echo; // msg to send back to self
     public $msg_samegroup; // msg to send if same non-public group
     public $msg_shouting; // msg to send if shouting from another channel
-	public $msg_private; // msg to send if private
+    public $msg_private; // msg to send if private
     public $senderChannel_number;
     public $senderChannel_name;
     public $message_receivers_lcase_usernames = null;
