@@ -101,6 +101,7 @@ class Main extends PluginBase {
         $this->getCommand("mute")->setExecutor(new Commands\Mute($this));
         $this->getCommand("unmute")->setExecutor(new Commands\Unmute($this));
         $this->getCommand("tell")->setExecutor(new Commands\Tell($this));
+        $this->getCommand("multiworldmute")->setExecutor(new Commands\MultiworldMute($this));
 
         // Overrides dont work with setExecutor ( I dont think ) so use commandmap instead
         $commandMap->register("me", new Commands\Me($this));

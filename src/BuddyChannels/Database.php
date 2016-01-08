@@ -784,6 +784,19 @@ class Database {
             }
             $curplayer_channelnum = $this->read_cached_user_channels($curplayer_lcase_name);
             $curplayer_hasmutedpub = $this->read_cached_user_haspublicmuted($curplayer_lcase_name);
+            $otherworldmessage = is_null($message->serverid) ? false : true;
+            $user_metadata = $this->db_getUserMeta($curplayer_lcase_name);
+            print_r($user_metadata);
+            if( isset ($user_metadata["settings"]["mutemultiworld"]) ) {
+                $curplayer_hasMutedMultiWorld = true;
+            } else {
+                $curplayer_hasMutedMultiWorld = false;
+            }
+            
+            // if this is a message from another server check users pref to receive it
+            if($curplayer_hasMutedMultiWorld and $otherworldmessage ) {
+                continue;
+            }
             // shouting reaches all users
             // unless the shout comes from a different channel from the target and the target has pub mute on
             // even the current player should receive the message in shout format (ppl like to see their group tagged on msg)

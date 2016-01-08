@@ -12,6 +12,10 @@ commands:
    aliases: [chan, ch]
    description: BuddyChannels commands.
    permission: buddychannels.commands.buddychannels
+ multiworldmute:
+   aliases: [mwm]
+   description: BuddyChannels mutiworld mute.
+   permission: buddychannels.commands.multiworldmute
  shout:
    aliases: [sh]
    description: BuddyChannels shout.
@@ -78,6 +82,9 @@ permissions:
        default: true
      buddychannels.commands.unmute:
        description: "Buddychannels allow umute public channel"
+       default: true
+     buddychannels.commands.multiworldmute:
+       description: "Buddychannels allow mute mutiworld messages"
        default: true
      buddychannels.commands.tell:
        description: "Buddychannels private message"
