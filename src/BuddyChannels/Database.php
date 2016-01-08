@@ -786,7 +786,6 @@ class Database {
             $curplayer_hasmutedpub = $this->read_cached_user_haspublicmuted($curplayer_lcase_name);
             $otherworldmessage = is_null($message->serverid) ? false : true;
             $user_metadata = $this->db_getUserMeta($curplayer_lcase_name);
-            print_r($user_metadata);
             if( isset ($user_metadata["settings"]["mutemultiworld"]) ) {
                 $curplayer_hasMutedMultiWorld = true;
             } else {
