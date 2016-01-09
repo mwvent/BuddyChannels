@@ -372,9 +372,6 @@ class MessageFormatter {
 		
 		$exactMatchesOnly = array();
 		$exactMatchesOnly [] = "sex";
-                $exactMatchesOnly [] = "$ex";
-                $exactMatchesOnly [] = "s3x";
-                $exactMatchesOnly [] = "$3x";
 		$exactMatchesOnly [] = "fcuk";
 		$exactMatchesOnly [] = "fuk";
 		$exactMatchesOnly [] = "fack";
