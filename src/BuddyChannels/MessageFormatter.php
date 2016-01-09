@@ -165,9 +165,9 @@ class MessageFormatter {
 		$message->msg = str_ireplace ( $this->badWordList, "*", $message->msg );
 	}
 	public function newlined_output($tagstring, $msgstartstring, $message) {
+                $msgstartstring = " ⇨ "; // U+00A0 No-Break space + Normal space
 		// not using newlined_output anymore
 		//return $tagstring .  "&r&f > &r" . $message;
-                /*
 		$max_width = 75;
 		$output_string = $tagstring . " " . $msgstartstring . " ";
 		$output_pos = strlen ( Main::removeColors ( "&", $output_string ) );
@@ -185,14 +185,9 @@ class MessageFormatter {
 			$output_string .= $messageword . " ";
 			$output_pos += $wordlength + 1;
 		}
-                 */
-                //$small_font_spacechar = "  "; // U+00A0 No-Break space + Normal space
-                //"​֍" - looks like large space
-                //
-		//return $output_string;
-                $message .= " ";
-                //return  $tagstring . $msgstartstring . str_replace(" ",  $small_font_spacechar, $message );
-                return $tagstring . $msgstartstring . $this->small2test($message);
+                $small_font_spacechar = "  "; // U+00A0 No-Break space + Normal space
+                return  $tagstring . $msgstartstring . $message . $small_font_spacechar;
+                // return $tagstring . $msgstartstring . $this->small2test($message);
 	}
         
         
@@ -289,8 +284,8 @@ class MessageFormatter {
 					$message->userrank,
 					"YOU" 
 			);
-			$tagstring = "*" . implode ( " ", $message_elements_emoting );
-			$tagstring_echo = "*" . implode ( " ", $message_elements_emoting_echo );
+			$tagstring = "*" . implode ( "&r", $message_elements_emoting );
+			$tagstring_echo = "*" . implode ( "&r", $message_elements_emoting_echo );
 			// override other formats if emoting
 			$message->msg_shouting = 
                                 $this->newlined_output($tagstring, " " ,substr( $message->msg , 1));
