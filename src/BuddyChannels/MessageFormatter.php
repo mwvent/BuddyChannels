@@ -165,7 +165,6 @@ class MessageFormatter {
 		$message->msg = str_ireplace ( $this->badWordList, "*", $message->msg );
 	}
 	public function newlined_output($tagstring, $msgstartstring, $message) {
-                $msgstartstring = " ⇨ "; // U+00A0 No-Break space + Normal space
 		// not using newlined_output anymore
 		//return $tagstring .  "&r&f > &r" . $message;
 		$max_width = 75;
@@ -233,67 +232,69 @@ class MessageFormatter {
         }
 
         public function formatForChannels(\BuddyChannels\Message $message) {
-		$channel_formatted = "&o&n&6{" . $message->senderChannel_name . "}";
-		if ($message->senderChannel_number == 0) {
-			$channel_formatted = "&o&n&1{Public}";
-		}
-		
-		$servername_formatted = "";
-		if ( ! $message->server_name == "" ) {
-			$servername_formatted = "&o&n&8@" . $message->server_name;
-		}
-		
-		// echo
-		$message_elements_echo = array (
-				$servername_formatted,
-				$message->userrank,
-				"YOU" 
-		);
-		$tagstring = implode ( "&r&f ", $message_elements_echo );
-		$message->msg_echo = $this->newlined_output ( $tagstring, " &r ", $message->msg );
-		
-		// msg_private
-		$message->msg_private = "&l&o" . $message->username . " ---> TO YOU &r&f: " . $message->msg;
-		
-		// same channel
-		$message_elements_samechan = array (
-				$servername_formatted,
-				$message->userrank,
-				$message->username 
-		);
-		$tagstring = implode ( "&r&f ", $message_elements_samechan );
-		$message->msg_samegroup = $this->newlined_output ( $tagstring, " &r> ", $message->msg );
-		
-		// shouting or public
-		$message_elements_shout = array (
-				$servername_formatted,
-				$channel_formatted,
-				$message->userrank,
-				$message->username 
-		);
-		$tagstring = implode ( "&r&f ", $message_elements_shout );
-		$message->msg_shouting = $this->newlined_output ( $tagstring, " &r> ", $message->msg );
-		
-		// emoting
-		if( substr( $message->msg , 0 , 1 ) == "#" ) {
-			$message_elements_emoting = array (
-					$message->userrank,
-					$message->username 
-			);
-			$message_elements_emoting_echo = array (
-					$message->userrank,
-					"YOU" 
-			);
-			$tagstring = "*" . implode ( "&r", $message_elements_emoting );
-			$tagstring_echo = "*" . implode ( "&r", $message_elements_emoting_echo );
-			// override other formats if emoting
-			$message->msg_shouting = 
-                                $this->newlined_output($tagstring, " " ,substr( $message->msg , 1));
-			$message->msg_samegroup =
-                                $this->newlined_output($tagstring, " " ,substr( $message->msg , 1));
-			$message->msg_echo =
-                                $this->newlined_output($tagstring_echo, " " ,substr( $message->msg , 1));
-		}
+            $std_arrow = " &r&3▶&r&f ";
+            $channel_formatted = "&o&n&6{" . $message->senderChannel_name . "}";
+            if ($message->senderChannel_number == 0) {
+                    $channel_formatted = "&o&n&1{Public}";
+            }
+
+            $servername_formatted = "";
+            if ( ! $message->server_name == "" ) {
+                    $servername_formatted = "&o&n&8@" . $message->server_name;
+            }
+
+            // echo
+            $message_elements_echo = array (
+                            $servername_formatted,
+                            $message->userrank,
+                            "YOU" 
+            );
+            $tagstring = implode ( "&r&f ", $message_elements_echo );
+            $message->msg_echo = $this->newlined_output ( $tagstring, $std_arrow, $message->msg );
+
+            // msg_private
+            $message->msg_private = "&l&o" . $message->username . " ---> TO YOU &r&f: " . $message->msg;
+
+            // same channel
+            $message_elements_samechan = array (
+                            $servername_formatted,
+                            $message->userrank,
+                            $message->username 
+            );
+            $tagstring = implode ( "&r&f ", $message_elements_samechan );
+            $message->msg_samegroup = $this->newlined_output ( $tagstring, $std_arrow, $message->msg );
+
+            // shouting or public
+            $message_elements_shout = array (
+                            $servername_formatted,
+                            $channel_formatted,
+                            $message->userrank,
+                            $message->username 
+            );
+            $tagstring = implode ( "&r&f ", $message_elements_shout );
+            $message->msg_shouting = $this->newlined_output ( $tagstring, $std_arrow, $message->msg );
+
+            // emoting
+            if( substr( $message->msg , 0 , 1 ) == "#" ) {
+                    $message_elements_emoting = array (
+                                    $message->userrank,
+                                    $message->username 
+                    );
+                    $message_elements_emoting_echo = array (
+                                    $message->userrank,
+                                    "YOU" 
+                    );
+                    $tagstring = "*" . implode ( "&r&f", $message_elements_emoting );
+                    $tagstring_echo = "*" . implode ( "&r&f", $message_elements_emoting_echo );
+                    // override other formats if emoting
+                    $small_font_spacechar = "  &r&f"; // U+00A0 No-Break space + Normal space
+                    $message->msg_shouting = 
+                            $this->newlined_output($tagstring, $small_font_spacechar ,substr( $message->msg , 1));
+                    $message->msg_samegroup =
+                            $this->newlined_output($tagstring, $small_font_spacechar ,substr( $message->msg , 1));
+                    $message->msg_echo =
+                            $this->newlined_output($tagstring_echo, $small_font_spacechar ,substr( $message->msg , 1));
+            }
 	}
 	public function hasVeryBadLanguage($msg) {
 		// try some regexps 1st
