@@ -167,6 +167,7 @@ class MessageFormatter {
 	public function newlined_output($tagstring, $msgstartstring, $message) {
 		// not using newlined_output anymore
 		//return $tagstring .  "&r&f > &r" . $message;
+                /*
 		$max_width = 75;
 		$output_string = $tagstring . " " . $msgstartstring . " ";
 		$output_pos = strlen ( Main::removeColors ( "&", $output_string ) );
@@ -184,9 +185,59 @@ class MessageFormatter {
 			$output_string .= $messageword . " ";
 			$output_pos += $wordlength + 1;
 		}
-		return $output_string;
+                 */
+                //$small_font_spacechar = "  "; // U+00A0 No-Break space + Normal space
+                //"​֍" - looks like large space
+                //
+		//return $output_string;
+                $message .= " ";
+                //return  $tagstring . $msgstartstring . str_replace(" ",  $small_font_spacechar, $message );
+                return $tagstring . $msgstartstring . $this->small2test($message);
 	}
-	public function formatForChannels(\BuddyChannels\Message $message) {
+        
+        
+        public function small2test($txt) {
+            $oldfont = "abcdefghijklmnopqrstuvwxyz";
+            $newfont = "ａｂｃｄｅｆｇｈｉｊｋｌｍｎｏｐｑｒｓｔｕｖｗｘｙｚ";
+            $oldfont .= "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+            $newfont .= "ＡＢＣＤＥＦＧＨＩＪＫＬＭＮＯＰＱＲＳＴＵＶＷＸＹＺ";
+            $oldfont .= "0123456789:;<=>?@";
+            $newfont .= "０１２３４５６７８９：；＜＝＞？＠";
+            
+            $newfont_array = array();
+            preg_match_all('/./u', $newfont, $newfont_array);
+            $newfont_array = $newfont_array[0];
+            $oldfont_array = array(0);
+            preg_match_all('/./u', $oldfont, $oldfont_array);
+            $oldfont_array = $oldfont_array[0];
+            $oldmsgarray = [];
+            preg_match_all('/./u', $txt, $oldmsgarray);
+            $oldmsgarray = $oldmsgarray[0];
+            $newmsg = "";
+            
+            $preceedingwasctl = false;
+            foreach($oldmsgarray as $curchar) {
+                if($curchar == "&" or $curchar == "§") {
+                    $preceedingwasctl = ($preceedingwasctl == false);
+                    $newmsg .= $curchar;
+                    continue;
+                }
+                if($preceedingwasctl) {
+                    $preceedingwasctl = false;
+                    $newmsg .= $curchar;
+                    continue;
+                }
+                if(in_array($curchar, $oldfont_array)) {
+                    $newmsg .= $newfont_array[array_search($curchar, $oldfont_array)];
+                } else {
+                    $newmsg .= $curchar;
+                }
+            }
+            $small_font_spacechar = "  "; // U+00A0 No-Break space + Normal space
+            return $newmsg . $small_font_spacechar;
+        }
+
+        public function formatForChannels(\BuddyChannels\Message $message) {
 		$channel_formatted = "&o&n&6{" . $message->senderChannel_name . "}";
 		if ($message->senderChannel_number == 0) {
 			$channel_formatted = "&o&n&1{Public}";
@@ -204,7 +255,7 @@ class MessageFormatter {
 				"YOU" 
 		);
 		$tagstring = implode ( "&r&f ", $message_elements_echo );
-		$message->msg_echo = $this->newlined_output ( $tagstring, "&r&a‣&r", $message->msg );
+		$message->msg_echo = $this->newlined_output ( $tagstring, " &r ", $message->msg );
 		
 		// msg_private
 		$message->msg_private = "&l&o" . $message->username . " ---> TO YOU &r&f: " . $message->msg;
@@ -216,7 +267,7 @@ class MessageFormatter {
 				$message->username 
 		);
 		$tagstring = implode ( "&r&f ", $message_elements_samechan );
-		$message->msg_samegroup = $this->newlined_output ( $tagstring, "&r&a‣&r", $message->msg );
+		$message->msg_samegroup = $this->newlined_output ( $tagstring, " &r> ", $message->msg );
 		
 		// shouting or public
 		$message_elements_shout = array (
@@ -226,7 +277,7 @@ class MessageFormatter {
 				$message->username 
 		);
 		$tagstring = implode ( "&r&f ", $message_elements_shout );
-		$message->msg_shouting = $this->newlined_output ( $tagstring, "&r&a‣&r", $message->msg );
+		$message->msg_shouting = $this->newlined_output ( $tagstring, " &r> ", $message->msg );
 		
 		// emoting
 		if( substr( $message->msg , 0 , 1 ) == "#" ) {
@@ -238,12 +289,15 @@ class MessageFormatter {
 					$message->userrank,
 					"YOU" 
 			);
-			$tagstring = " * " . implode ( "&l&o&r&f ", $message_elements_emoting );
-			$tagstring_echo = " &l&o* " . implode ( "&l&o&r&f ", $message_elements_emoting_echo );
+			$tagstring = "*" . implode ( " ", $message_elements_emoting );
+			$tagstring_echo = "*" . implode ( " ", $message_elements_emoting_echo );
 			// override other formats if emoting
-			$message->msg_shouting = $tagstring . " &l&o" . substr( $message->msg , 1);
-			$message->msg_samegroup = $tagstring . " &l&o" . substr( $message->msg , 1);
-			$message->msg_echo = $tagstring_echo . " &l&o" .substr( $message->msg , 1);
+			$message->msg_shouting = 
+                                $this->newlined_output($tagstring, " " ,substr( $message->msg , 1));
+			$message->msg_samegroup =
+                                $this->newlined_output($tagstring, " " ,substr( $message->msg , 1));
+			$message->msg_echo =
+                                $this->newlined_output($tagstring_echo, " " ,substr( $message->msg , 1));
 		}
 	}
 	public function hasVeryBadLanguage($msg) {
