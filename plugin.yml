@@ -44,6 +44,10 @@ commands:
    aliases: [msg]
    description: BuddyChannels tell.
    permission: buddychannels.commands.tell
+ hidetag:
+   aliases: [ht]
+   description: Hide name tag.
+   permission: buddychannels.commands.hidetag
 permissions:
  buddychannels:
   default: true
@@ -89,3 +93,6 @@ permissions:
      buddychannels.commands.tell:
        description: "Buddychannels private message"
        default: true
+     buddychannels.commands.hidetag:
+       description: "Hide nametag"
+       default: false
