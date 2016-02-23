@@ -303,6 +303,9 @@ class Main extends PluginBase {
             case "":
                 return "";
                 break;
+            case "guest":
+                $rank_formatted = "&6[Newbie]";
+                break;
             case "newbie":
                 $rank_formatted = "&6[Newbie]";
                 break;
