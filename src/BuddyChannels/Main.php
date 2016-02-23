@@ -318,6 +318,9 @@ class Main extends PluginBase {
             case "elder":
                 $rank_formatted = "&c[Elder]";
                 break;
+            case "Legendary":
+                $rank_formatted = "&1<&1L&aE&2G&bE&3N&cD&4A&dR&5Y&1>";
+                break;
             case "youtuber":
                 $rank_formatted = "&c[&dYou&fTuber&c]";
                 break;
