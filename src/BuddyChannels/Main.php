@@ -38,10 +38,17 @@ class Main extends PluginBase {
     public $readRSSTask;
     public $websiteAdvertisementTask;
     public $rankOverrides;
+    public $baseRanks = [];
     /**
      * @var SimpleAuth
      */
     private $simpleAuth = null;
+    
+    
+    public function setBaseRank(string $playerName, string $rank) {
+        $playerName = strtolower($playerName);
+        $this->baseRanks[$playerName] = $rank;
+    }
     
     public function registerFormatter(MessageFormatter $callBackClass, $pre = false) {
         if($pre) { 
@@ -274,12 +281,18 @@ class Main extends PluginBase {
         $player = $this->getServer()->getPlayer($playername);
         $player = $player instanceof Player ? $player : $this->getServer()->getOfflinePlayer($playername);
         $rank = "";
-
-        if (strtolower($this->read_cfg("read-ranks-from", "none")) == "pureperms") {
-            // $rank = $this->purePerms->getUser($player)->getGroup()->getName();
-            $rank = $this->purePerms->getUserDataMgr()->getGroup($player)->getName();
+        // pull rank from PurePerms (if set in config) but if another plugin has called
+        // accross to set the BaseRank use that instead (optimisation)
+        if( isset($this->baseRanks[strtolower($playername)]) ) {
+            $rank = $this->baseRanks[strtolower($playername)];
+        } else {
+            if (strtolower($this->read_cfg("read-ranks-from", "none")) == "pureperms") {
+                // $rank = $this->purePerms->getUser($player)->getGroup()->getName();
+                $rank = $this->purePerms->getUserDataMgr()->getGroup($player)->getName();
+            }
         }
 
+        // override the rank if override set
         if ($this->read_cfg("use-rank-override", false)) {
             if (isset($this->rankOverrides->data[strtolower($playername)])) {
                 $rank = $this->rankOverrides->data[strtolower($playername)];
