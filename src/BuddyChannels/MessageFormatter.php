@@ -297,6 +297,8 @@ class MessageFormatter {
             }
 	}
 	public function hasVeryBadLanguage($msg) {
+                $msg = Main::removeColors("&", $msg);
+                $msg = Main::removeColors("§", $msg);
 		// try some regexps 1st
 		$words_to_regexp_test = array(
 				"fuck",
@@ -321,7 +323,7 @@ class MessageFormatter {
 				
 		);
 		foreach ( $regexps as $regexp ) {
-			if (preg_match ( $regexp, Main::removeColors ( "&", $msg ) )) {
+			if (preg_match ( $regexp, $msg )) {
 				return true;
 			}
 		}
