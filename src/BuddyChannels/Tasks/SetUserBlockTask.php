@@ -64,9 +64,10 @@ class SetUserBlockTask extends Task {
 	if( isset($returnmsg) ) {
 	    $this->player->sendMessage(Main::translateColors("&", $returnmsg));
 	}
-	
+	/*
 	if( isset($targetsmsg) && !is_null($this->targetplayer) ) {
 	    $this->targetplayer->sendMessage(Main::translateColors("&", $targetsmsg));
 	}
+        */
     }
 }
