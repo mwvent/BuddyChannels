@@ -166,7 +166,7 @@ class MessageFormatter {
 	}
 	public function newlined_output($tagstring, $msgstartstring, $message) {
 		// not using newlined_output anymore
-		//return $tagstring .  "&r&f > &r" . $message;
+		return $tagstring .  "&r&f > &r" . $message;
 		$max_width = 75;
 		$output_string = $tagstring . " " . $msgstartstring . " ";
 		$output_pos = strlen ( Main::removeColors ( "&", $output_string ) );
