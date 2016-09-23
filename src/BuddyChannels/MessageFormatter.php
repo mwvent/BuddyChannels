@@ -306,8 +306,7 @@ class MessageFormatter {
 				"bastard",
 				"fucker",
 				"fuk you",
-				"fk you",
-				"fak"
+				"fk you"
 		);
 		$regexps = array();
 		foreach($words_to_regexp_test as $word) {
@@ -319,7 +318,6 @@ class MessageFormatter {
 			$newregexp .= ")/i";
 		}
 		$regexps = array (
-				"/(f+ *a+ *k+)/i" ,
 				"/(f+ *u+ *c+ *k+)/i" ,
 				"/(b+ *i+ *t+ *c+ *h+)/i" ,
 				
@@ -388,6 +386,12 @@ class MessageFormatter {
 		$exactMatchesOnly [] = "fuqing";
 		$exactMatchesOnly [] = "baitach";
 		$exactMatchesOnly [] = "taits";
+		$exactMatchesOnly [] = "fak";
+		$exactMatchesOnly [] = "faking";
+		$exactMatchesOnly [] = "fakin";
+		$exactMatchesOnly [] = "fakk";
+		$exactMatchesOnly [] = "fakker";
+		$exactMatchesOnly [] = "faker";
 		// where users have used asterixes
 		$exactMatchesOnly [] = "f";
 		$exactMatchesOnly [] = "fk";
