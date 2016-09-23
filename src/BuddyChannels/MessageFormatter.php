@@ -306,7 +306,8 @@ class MessageFormatter {
 				"bastard",
 				"fucker",
 				"fuk you",
-				"fk you"
+				"fk you",
+				"fak"
 		);
 		$regexps = array();
 		foreach($words_to_regexp_test as $word) {
@@ -318,6 +319,7 @@ class MessageFormatter {
 			$newregexp .= ")/i";
 		}
 		$regexps = array (
+				"/(f+ *a+ *k+)/i" ,
 				"/(f+ *u+ *c+ *k+)/i" ,
 				"/(b+ *i+ *t+ *c+ *h+)/i" ,
 				
