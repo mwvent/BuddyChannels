@@ -87,8 +87,9 @@ class Main extends PluginBase {
         $this->saveDefaultConfig();
 
         /* override default commands */
-        $commandMap = $this->getServer()->getCommandMap();
 
+        $commandMap = $this->getServer()->getCommandMap();
+/*
         $commandToOverride = $commandMap->getCommand("me");
         $commandToOverride->setLabel("me_disabled"); //This prepares the command for the next step, setting up the Command->nextLabel
         $commandToOverride->unregister($commandMap); //This changes the current label
@@ -100,6 +101,7 @@ class Main extends PluginBase {
         $commandToOverride = $commandMap->getCommand("msg");
         $commandToOverride->setLabel("msg_disabled"); //This prepares the command for the next step, setting up the Command->nextLabel
         $commandToOverride->unregister($commandMap); //This changes the current label
+*/
         // register Commands
         $this->getCommand("buddychannels")->setExecutor(new Commands\BuddyChannels($this));
         $this->getCommand("shout")->setExecutor(new Commands\Shout($this));
@@ -110,7 +112,7 @@ class Main extends PluginBase {
         $this->getCommand("tell")->setExecutor(new Commands\Tell($this));
         $this->getCommand("multiworldmute")->setExecutor(new Commands\MultiworldMute($this));
 		$this->getCommand("hidetag")->setExecutor(new Commands\Hidetag($this));
-
+/*
         // Overrides dont work with setExecutor ( I dont think ) so use commandmap instead
         $commandMap->register("me", new Commands\Me($this));
         $commandMap->register("me", new Commands\Me($this), "me");
@@ -118,7 +120,7 @@ class Main extends PluginBase {
         $commandMap->register("tell", new Commands\Tell($this));
         $commandMap->register("tell", new Commands\Tell($this), "tell");
         $commandMap->register("tell", new Commands\Tell($this), "msg");
-
+*/
         $this->getServer()->getPluginManager()->registerEvents(new EventListener($this), $this);
         $this->website = $this->read_cfg("website");
         $this->database = new \BuddyChannels\Database($this);
