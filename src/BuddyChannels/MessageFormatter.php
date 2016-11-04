@@ -398,6 +398,8 @@ class MessageFormatter {
 		$exactMatchesOnly [] = "dic";
 		$exactMatchesOnly [] = "bih";
 		$exactMatchesOnly [] = "bitc";
+		$exactMatchesOnly [] = "fvck";
+		$exactMatchesOnly [] = "fvcker";
 		
 		// replace caps
 		$msg = strtolower ( $msg );
