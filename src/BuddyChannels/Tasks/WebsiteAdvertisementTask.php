@@ -48,6 +48,6 @@ class WebsiteAdvertisementTask extends Task {
 			}
 		}
 		$consolemsg .= implode(",", $userNamesSentTo). ") : " . $adMessage;
-		$this->plugin->getLogger()->info(Main::translateColors("&",$consolemsg));
+		$this->plugin->getLogger()->debug(Main::translateColors("&",$consolemsg));
     }
 }
