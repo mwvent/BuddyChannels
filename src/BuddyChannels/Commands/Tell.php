@@ -13,8 +13,9 @@ use pocketmine\utils\TextFormat;
 
 class Tell extends Command implements CommandExecutor {
 	public function __construct(Main $plugin) {
-        $this->plugin = $plugin;
-    }
+        	$this->plugin = $plugin;
+		parent::__construct("Tell", "Private Message");
+    	}
 	
 	public function onCommand(CommandSender $sender, Command $cmd, $label, array $args) {
 		$this->execute($sender, $cmd, $args);

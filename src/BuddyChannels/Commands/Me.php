@@ -13,8 +13,9 @@ use pocketmine\utils\TextFormat;
 
 class Me extends Command implements CommandExecutor {
 	public function __construct(Main $plugin) {
-        $this->plugin = $plugin;
-    }
+        	$this->plugin = $plugin;
+		parent::__construct("Me", "Emote");
+    	}
 	
 	public function onCommand(CommandSender $sender, Command $cmd, $label, array $args) {
 		$this->execute($sender, $cmd, $args);
